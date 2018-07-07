@@ -50,3 +50,75 @@ run:
 #Configure management console
 
 sudo chef-manage-ctl reconfigure
+
+
+-------------------------------------------
+
+Data collection:
+
+
+Step 1: Configure a Data Collector token in Chef Automate¶
+
+All messages sent to Chef Automate are performed over HTTP and are authenticated with a pre-shared key called a token. Every Chef Automate installation configures a token by default, but we strongly recommend that you create your own.
+
+Note
+
+The Data Collector token has no minimum or maximum character length restrictions. While the UTF-8 character set is supported, US-ASCII is recommended for best results.
+
+To set your own token, add the following to your /etc/delivery/delivery.rb file:
+
+    data_collector['token'] = 'sometokenvalue'
+    # Save and close the file
+
+To apply the changes, run:
+
+    sudo automate-ctl reconfigure
+
+If you do not configure a token, the default token value is: 93a49a4f2482c64126f7b6015e6b0f30284287ee4054ff8807fb63d9cbd1c506
+
+
+Step 2: Configure your Chef server to point to Chef Automate¶
+
+In addition to forwarding Chef run data to Automate, Chef server will send messages to Chef Automate whenever an action is taken on a Chef server object, such as when a cookbook is uploaded to the Chef server or when a user edits a role.
+
+
+
+Setting up data collection on Chef server versions 12.14 and higher¶
+
+Channel the token setting through the veil secrets library because the token is considered a secret, and cannot appear in /etc/opscode/chef-server.rb:
+
+    sudo chef-server-ctl set-secret data_collector token 'TOKEN'
+    sudo chef-server-ctl restart nginx
+    sudo chef-server-ctl restart opscode-erchef
+
+Then add the following setting to /etc/opscode/chef-server.rb on the Chef server:
+
+    data_collector['root_url'] = 'https://my-automate-server.mycompany.com/data-collector/v0/'
+    # Add for compliance scanning
+    profiles['root_url'] = 'https://my-automate-server.mycompany.com'
+    # Save and close the file
+
+To apply the changes, run:
+
+    chef-server-ctl reconfigure
+
+where my-automate-server.mycompany.com is the fully-qualified domain name of your Chef Automate server.
+
+------------------------------------
+Automate Compliance:
+
+Use the following cookbook on to get compliance working on your nodes:
+https://github.com/daringanitch/automate-compliance-cookbook.git
+
+clone this cookbook into your chef-repo cookbooks folder then upload to your chef server.
+1. $git clone https://github.com/daringanitch/automate-compliance-cookbook.git
+2. $berks install && berks upload.
+
+Add this cookbook to your nodes and make sure you have downloaded the correct security profiles on the automate server.
+
+current cookbook has these security profiles:
+
+chefadmin/linux-baseline 
+chefadmin/windows-baseline
+
+If you need more, add them to the attributes default.rb in this cookbook. (check json formatting) and add profiles on the automate server.
