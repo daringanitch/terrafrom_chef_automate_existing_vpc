@@ -133,7 +133,7 @@ Setup the Delivery CLI to, by default, contact the Chef Automate server at SERVE
 $ delivery setup --server=SERVER --ent=ENTERPRISE --org=ORGANIZATION --user=USERNAME
 Note
 
-The server, enterprise, organization, and user must already exist.
+The server, enterprise, organization, and user must already exist (key generated for user and added to automate).
 
 Create a cookbook:
 
