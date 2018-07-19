@@ -122,3 +122,34 @@ chefadmin/linux-baseline
 chefadmin/windows-baseline
 
 If you need more, add them to the attributes default.rb in this cookbook. (check json formatting) and add profiles on the automate server.
+________________________________________________________________________
+Workflow / Delivery
+
+Make a working directory (workspace in the example):
+
+$ mkdir ~/workspace && cd ~/workspace
+Setup the Delivery CLI to, by default, contact the Chef Automate server at SERVER, with a default ENTERPRISE and ORGANIZATION:
+
+$ delivery setup --server=SERVER --ent=ENTERPRISE --org=ORGANIZATION --user=USERNAME
+Note
+
+The server, enterprise, organization, and user must already exist.
+
+Create a cookbook:
+
+$ chef generate cookbook NEW-COOKBOOK-NAME
+$ cd NEW-COOKBOOK-NAME
+This uses the Chef development kit to generate a new cookbook, including a default recipe and default ChefSpec tests.
+
+Create an initial commit (use git status to verify the change) on the “master” branch:
+
+$ git add .
+$ git commit -m 'Initial Commit'
+Running chef generate initialized a git repository automatically for this cookbook. If you created the build cookbook manually, initialize the git repository with the git init command.
+
+Initialize the cookbook for Chef Automate:
+
+$ delivery init
+This creates a new project in Chef Automate, pushes the master branch, creates a feature branch, generates a default Chef Automate project configuration file, pushes the first change for review, and then opens a browser window that shows the change.
+
+Now that you have initialized your project, it is recommended that you integrate the delivery-truck cookbook with your project. Delivery Truck can ensure good build cookbook behavior as well as provide you with recipes already set up to test your project cookbooks and applications.
